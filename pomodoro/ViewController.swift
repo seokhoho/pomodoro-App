@@ -20,6 +20,7 @@ class ViewController: UIViewController {
     @IBOutlet weak var progressView: UIProgressView!
     @IBOutlet weak var datePicker: UIDatePicker!
     
+    @IBOutlet weak var imageView: UIImageView!
     @IBOutlet weak var cancelButton: UIButton!
     @IBOutlet weak var toggleButton: UIButton!
     
@@ -58,7 +59,17 @@ class ViewController: UIViewController {
                 let seconde = (self.currentSeconds % 3600 ) % 60
                 self.timerLabel.text = String(format: "%02d:%02d:%02d", hour, minutes, seconde)
                 self.progressView.progress = Float(self.currentSeconds) / Float(self.duration)
-                debugPrint(self.progressView.progress)
+                UIView.animate(withDuration: 0.5, delay: 0, animations: {
+                    self.imageView.transform = CGAffineTransform(rotationAngle: .pi)
+                    //pi 파이 값을 넣어 이미지가 180도로 회전
+                    //CGAffineTransform은 구조체. 특징은 뷰의 프레임을 계산하지 않고 2D그래픽 효과를 줄 수 있다
+                })
+                UIView.animate(withDuration: 0.5, delay: 0.5, animations: {
+                    self.imageView.transform = CGAffineTransform(rotationAngle: .pi * 2)
+                    //pi * 2 값으로 360도 회전 delay 0.5로 180도로 먼저 돌고 동작하게 순서를 구현함
+                })
+                
+                
                 
                 if self.currentSeconds <= 0 {
                     self.stopTimer()
@@ -75,8 +86,12 @@ class ViewController: UIViewController {
         }
         self.timerStatus = .end
         self.cancelButton.isEnabled = false
-        self.setTimerInfoViewVisble(isHidden: true)
-        self.datePicker.isHidden = false
+        UIView.animate(withDuration: 0.5, animations: {
+            self.timerLabel.alpha = 0
+            self.progressView.alpha = 0
+            self.datePicker.alpha = 1
+            self.imageView.transform = .identity
+        })
         self.toggleButton.isSelected = false
         self.timer?.cancel()
         self.timer = nil
@@ -99,8 +114,11 @@ class ViewController: UIViewController {
         case .end:
             self.currentSeconds = self.duration
             self.timerStatus = .start
-            self.setTimerInfoViewVisble(isHidden: false)
-            self.datePicker.isHidden = true
+            UIView.animate(withDuration: 0.5, animations: {
+                self.timerLabel.alpha = 1
+                self.progressView.alpha = 1
+                self.datePicker.alpha = 0
+            })
             self.toggleButton.isSelected = true
             self.cancelButton.isEnabled = true
             self.startTimer()
